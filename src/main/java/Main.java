@@ -13,7 +13,7 @@ import static com.googlecode.lanterna.input.KeyType.ArrowUp;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("Lanterna exercise version 3");
+        System.out.println("Lanterna exercise version 4");
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
