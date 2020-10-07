@@ -11,7 +11,9 @@ import java.util.Random;
 import static com.googlecode.lanterna.input.KeyType.ArrowDown;
 import static com.googlecode.lanterna.input.KeyType.ArrowUp;
 
+
 public class Main {
+
     public static void main(String[] args) throws Exception {
         System.out.println("Lanterna exercise version 4");
 
@@ -20,19 +22,10 @@ public class Main {
 
         final char WallChar = '\u2588';
         final char BombChar = '\u058D';
-
-        //Create walls as obsticles for player
         List<Position> wall = new ArrayList<>();
-        int wallrow = 15;
-        int wallcolumn = 45;
-        //Add horisontal obsticle
-        for (int i = 10;i<40;i++) {
-            wall.add(new Position(i,wallrow));
-        }
-        //Add vertical obsticle
-        for (int i = 5;i<20;i++) {
-            wall.add(new Position(wallcolumn,i));
-        }
+
+        CreateWall(terminal, WallChar, wall);
+
         //Create a bomb that hunt the player
         Random r = new Random();
         Position bombPosition = new Position(r.nextInt(80), r.nextInt(24));
@@ -43,13 +36,7 @@ public class Main {
         terminal.putCharacter(BombChar);
         terminal.flush();
 
-        //Print walls
-        terminal.setForegroundColor(TextColor.ANSI.RED);
-        for (Position p : wall) {
-            terminal.setCursorPosition(p.getX(), p.getY());
-            terminal.putCharacter(WallChar);
-            terminal.flush();
-        }
+
         //move around the player
         boolean continueReadingInput = true;
         int row = 1;
@@ -187,5 +174,27 @@ public class Main {
                 }
             }
         } while (continueReadingInput);
+    }
+
+    public static void CreateWall(Terminal terminal, char WallChar, List<Position> wall) throws Exception {
+        //Create walls
+        int wallrow = 15;
+        int wallcolumn = 45;
+
+        //Add horisontal obsticle
+        for (int i = 10;i<40;i++) {
+            wall.add(new Position(i,wallrow));
+        }
+        //Add vertical obsticle
+        for (int i = 5;i<20;i++) {
+            wall.add(new Position(wallcolumn,i));
+        }
+        //Print walls
+        terminal.setForegroundColor(TextColor.ANSI.RED);
+        for (Position p : wall) {
+            terminal.setCursorPosition(p.getX(), p.getY());
+            terminal.putCharacter(WallChar);
+            terminal.flush();
+        }
     }
 }
