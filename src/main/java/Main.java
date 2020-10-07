@@ -24,7 +24,8 @@ public class Main {
         final char BombChar = '\u058D';
         List<Position> wall = new ArrayList<>();
 
-        CreateWall(terminal, WallChar, wall);
+        CreateWall(wall);
+        PrintWall(terminal, WallChar, wall);
 
         //Create a bomb that hunt the player
         Random r = new Random();
@@ -176,7 +177,7 @@ public class Main {
         } while (continueReadingInput);
     }
 
-    public static void CreateWall(Terminal terminal, char WallChar, List<Position> wall) throws Exception {
+    public static void CreateWall(List<Position> wall) throws Exception {
         //Create walls
         int wallrow = 15;
         int wallcolumn = 45;
@@ -189,6 +190,9 @@ public class Main {
         for (int i = 5;i<20;i++) {
             wall.add(new Position(wallcolumn,i));
         }
+
+    }
+    public static void PrintWall(Terminal terminal, char WallChar, List<Position> wall) throws Exception {
         //Print walls
         terminal.setForegroundColor(TextColor.ANSI.RED);
         for (Position p : wall) {
