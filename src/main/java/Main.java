@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.googlecode.lanterna.input.KeyType.ArrowDown;
-import static com.googlecode.lanterna.input.KeyType.ArrowUp;
-
 
 public class Main {
 
@@ -19,6 +16,7 @@ public class Main {
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
+        terminal.setCursorVisible(false);
 
         final char WallChar = '\u2588';
         final char BombChar = '\u058D';
@@ -40,18 +38,15 @@ public class Main {
 
         //move around the player
         boolean continueReadingInput = true;
-        int row = 1;
-        int column = 1;
-        int oldRow = 1;
-        int oldColumn = 1;
-        final char player = '\u0398';
-        terminal.setCursorVisible(false);
-        terminal.setCursorPosition(column, row);
-        terminal.putCharacter(player);
-        terminal.flush();
+
+        Player player = new Player(1, 1);
+        PrintPlayer(terminal, player);
+
+        //start position of player
+
         do {
-            oldRow = row;
-            oldColumn = column;
+            player.setOldRow(player.getRow());
+            player.setOldColumn(player.getColumn());
             oldBombRow = bombPosition.getY();
             oldBombColumn = bombPosition.getX();
             KeyStroke keyStroke = null;
@@ -64,12 +59,12 @@ public class Main {
 
             switch (type) {
                 case ArrowDown:
-                    row +=1; //move player
+                    player.movePlayerDown(); //move player
                     //move bomb
-                    if (bombPosition.getY() < row)
+                    if (bombPosition.getY() < player.getRow())
                         bombPosition.setY(bombPosition.getY()+2);
-                    else if (bombPosition.getY() == row) {
-                        if (bombPosition.getX() < column)
+                    else if (bombPosition.getY() == player.getRow()) {
+                        if (bombPosition.getX() < player.getColumn())
                             bombPosition.setX(bombPosition.getX()+2);
                         else
                             bombPosition.setX(bombPosition.getX()-2);
@@ -78,12 +73,12 @@ public class Main {
                         bombPosition.setY(bombPosition.getY()-2);
                     break;
                 case ArrowUp:
-                    row -=1; //move player
+                    player.movePlayerUp();
                     //move bomb
-                    if (bombPosition.getY() < row)
+                    if (bombPosition.getY() < player.getRow())
                         bombPosition.setY(bombPosition.getY()+2);
-                    else if (bombPosition.getY() == row) {
-                        if (bombPosition.getX() < column)
+                    else if (bombPosition.getY() == player.getRow()) {
+                        if (bombPosition.getX() < player.getColumn())
                             bombPosition.setX(bombPosition.getX()+2);
                         else
                             bombPosition.setX(bombPosition.getX()-2);
@@ -92,12 +87,12 @@ public class Main {
                         bombPosition.setY(bombPosition.getY()-2);
                     break;
                 case ArrowLeft:
-                    column -=1; //move player
+                    player.movePlayerLeft(); //move player
                     //move bomb
-                    if (bombPosition.getX() < column)
+                    if (bombPosition.getX() < player.getColumn())
                         bombPosition.setX(bombPosition.getX()+2);
-                    else if (bombPosition.getX() == column) {
-                        if (bombPosition.getY() < row)
+                    else if (bombPosition.getX() == player.getColumn()) {
+                        if (bombPosition.getY() < player.getRow())
                             bombPosition.setY(bombPosition.getY()+2);
                         else
                             bombPosition.setY(bombPosition.getY()-2);
@@ -106,12 +101,12 @@ public class Main {
                         bombPosition.setX(bombPosition.getX()-2);
                     break;
                 case ArrowRight:
-                    column +=1; //move player
+                    player.movePlayerRight(); //move player
                     //move bomb
-                    if (bombPosition.getX() < column)
+                    if (bombPosition.getX() < player.getColumn())
                         bombPosition.setX(bombPosition.getX()+2);
-                    else if (bombPosition.getX() == column) {
-                        if (bombPosition.getY() < row)
+                    else if (bombPosition.getX() == player.getColumn()) {
+                        if (bombPosition.getY() < player.getRow())
                             bombPosition.setY(bombPosition.getY()+2);
                         else
                             bombPosition.setY(bombPosition.getY()-2);
@@ -120,7 +115,7 @@ public class Main {
                         bombPosition.setX(bombPosition.getX()-2);
             }
             //Check if inside screen
-            if (row == 0 || column ==0 || row > 24 || column > 80) {
+            if (player.getRow() == 0 || player.getColumn() ==0 || player.getRow() > 24 || player.getColumn() > 80) {
                 continueReadingInput = false;
                 System.out.println("Quit ");
                 terminal.close();
@@ -129,20 +124,17 @@ public class Main {
                 //Check if player moved into the walls
                 boolean CrashWall = false;
                 for (Position p : wall) {
-                    if (p.getX() == column && p.getY() == row)
+                    if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
                 if (CrashWall == true) {
-                    column = oldColumn;
-                    row = oldRow;
+                    player.setColumn(player.getOldColumn());
+                    player.setRow(player.getOldRow());
                 }
                 else {
                     //Move the player
-                    terminal.setForegroundColor(TextColor.ANSI.WHITE);
-                    terminal.setCursorPosition(column, row);
-                    terminal.putCharacter(player);
-                    terminal.setCursorPosition(oldColumn, oldRow);
-                    terminal.putCharacter(' ');
+
+                    PrintPlayer(terminal, player);
                     //Move the bomb
                     terminal.setForegroundColor(TextColor.ANSI.WHITE);
                     terminal.setCursorPosition(bombPosition.getX(), bombPosition.getY());
@@ -154,7 +146,7 @@ public class Main {
 
                     //Check the bomb position
                     boolean CrashBomb = false;
-                    if (bombPosition.getX() == column && bombPosition.getY() == row) {
+                    if (bombPosition.getX() == player.getColumn() && bombPosition.getY() == player.getRow()) {
                         CrashBomb = true;
                     }
                     if (CrashBomb == true) {
@@ -200,5 +192,13 @@ public class Main {
             terminal.putCharacter(WallChar);
             terminal.flush();
         }
+    }
+    public static void PrintPlayer(Terminal terminal, Player player) throws Exception {
+        terminal.setForegroundColor(TextColor.ANSI.WHITE);
+        terminal.setCursorPosition(player.getColumn(), player.getRow());
+        terminal.putCharacter(player.getSymbol());
+        terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
+        terminal.putCharacter(' ');
+        terminal.flush();
     }
 }
