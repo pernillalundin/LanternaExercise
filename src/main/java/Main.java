@@ -54,6 +54,7 @@ public class Main {
                 case ArrowDown:
                   /*  player.movePlayerDown(); //move player
                     FollowPlayer(player, enemy1); //move enemy */
+                    PrintGameOver(terminal, player); //Print GAME OVER
                     break;
 
                 case ArrowUp:
@@ -98,25 +99,7 @@ public class Main {
                     }
                     if (CrashEnemy == true) {
                         continueReadingInput = false;
-                        //Print GAME OVER
-                        String GameOver = "GAME OVER";
-                        int GameOverRow = 12;
-                        int GameOverColumn = 40;
-                        for (int i = 0; i < GameOver.length(); i++) {
-                            terminal.setCursorPosition(GameOverColumn, GameOverRow);
-                            terminal.putCharacter(GameOver.charAt(i));
-                            GameOverColumn += 1;
-                        }
-                        terminal.flush();
-                        //Print points
-                        PrintPoints(terminal, player,43,13);
-                        terminal.setCursorPosition(46, 13);
-                        terminal.putCharacter('p');
-                        terminal.flush();
-
-                        Thread.sleep(2000);
-                        System.out.println("Quit ");
-                        terminal.close();
+                        PrintGameOver(terminal, player); //Print GAME OVER
                     }
                 }
             }
@@ -198,6 +181,27 @@ public class Main {
         terminal.setCursorPosition(enemy.getOldColumn(), enemy.getOldRow());
         terminal.putCharacter(' ');
         terminal.flush();
+    }
+
+    public static void PrintGameOver(Terminal terminal, Player player) throws Exception {
+        String GameOver = "GAME OVER";
+        int GameOverRow = 12;
+        int GameOverColumn = 40;
+        for (int i = 0; i < GameOver.length(); i++) {
+            terminal.setCursorPosition(GameOverColumn, GameOverRow);
+            terminal.putCharacter(GameOver.charAt(i));
+            GameOverColumn += 1;
+        }
+        terminal.flush();
+
+        PrintPoints(terminal, player,43,13); //Print points
+        terminal.setCursorPosition(46, 13);
+        terminal.putCharacter('p');
+        terminal.flush();
+
+        Thread.sleep(2000);
+        System.out.println("Quit ");
+        terminal.close();
     }
 
     public static void FollowPlayer(Player player, Enemy enemy) {
