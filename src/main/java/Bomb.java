@@ -8,6 +8,7 @@ public class Bomb {
         private int oldRow;
         private int oldColumn;
         private final char symbol;
+        private boolean isAlive;
 
         public Bomb() {
             Random r = new Random();
@@ -16,7 +17,16 @@ public class Bomb {
             this.oldRow = 0;
             this.oldColumn = 0;
             this.symbol = '\u058D';
+            this.isAlive=true;
         }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
 
     public int getRow() {
         return row;

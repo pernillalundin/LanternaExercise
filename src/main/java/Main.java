@@ -35,7 +35,7 @@ public class Main {
 
         //Create bomb
         Bomb bomb1 = new Bomb();
-        PrintBomb(terminal,bomb1);
+        PrintBomb(terminal, bomb1);
 
         //Repeat game
 
@@ -46,49 +46,61 @@ public class Main {
             enemy1.setOldRow(enemy1.getRow());
             enemy1.setOldColumn(enemy1.getColumn());
 
-           bomb1.setOldRow((bomb1.getRow()));
-           bomb1.setColumn(bomb1.getColumn());
+            bomb1.setOldRow((bomb1.getRow()));
+            bomb1.setColumn(bomb1.getColumn());
 
             //wait for user input
+            int index = 0;
             KeyStroke keyStroke = null;
+
+
+        /*    do {
+                index++;
+                if(index % 100 == 0) {
+                    DropBomb(player, bomb1);
+                    PrintBomb(terminal, bomb1);
+                }
+            } while (bomb1.isAlive());*/
 
             do {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
-            }
-            while (keyStroke == null);
+                index++;
+                if(index % 100 == 0) {
+                    DropBomb(player, bomb1);
+                    PrintBomb(terminal, bomb1);
+                }
+            }while (keyStroke==null);
+
             KeyType type = keyStroke.getKeyType();
 
             switch (type) {
                 case ArrowDown:
                     player.movePlayerDown(); //move player
                     FollowPlayer(player, enemy1); //move enemy
-                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowUp:
                     player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy
-                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
                     FollowPlayer(player, enemy1); //move enemy
-                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowRight:
                     player.movePlayerRight(); //move player
                     FollowPlayer(player, enemy1); //move enemy
-                    DropBomb(player,bomb1);
                     break;
 
             }
             //Check if inside screen
-            continueReadingInput = isInScreen(terminal,player);
+            continueReadingInput = isInScreen(terminal, player);
 
             if (continueReadingInput == true) {
+
                 //Check if player moved into the walls
                 boolean CrashWall = false;
                 for (Position p : wall) {
@@ -105,7 +117,13 @@ public class Main {
                     //Move the enemy
                     PrintEnemy(terminal, enemy1);
                     PrintWall(terminal, WallChar, wall);
-                    PrintBomb(terminal, bomb1);
+
+                    index++;
+                    if(index % 4 == 0) {
+                        DropBomb(player, bomb1);
+                        PrintBomb(terminal, bomb1);
+                    }
+
 
                     //Check the bomb position
                     boolean CrashEnemy = false;
@@ -176,7 +194,8 @@ public class Main {
         terminal.putCharacter(' ');
         terminal.flush();
     }
-    public static void PrintBomb(Terminal terminal,Bomb bomb) throws Exception{
+
+    public static void PrintBomb(Terminal terminal, Bomb bomb) throws Exception {
         terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
         terminal.setCursorPosition(bomb.getColumn(), bomb.getRow());
         terminal.putCharacter(bomb.getSymbol());
@@ -200,7 +219,8 @@ public class Main {
         }
 
     }
-    public static void DropBomb (Player player,Bomb bomb){
+
+    public static void DropBomb(Player player, Bomb bomb) {
         bomb.moveBombDown();
     }
 
@@ -211,8 +231,7 @@ public class Main {
             System.out.println("Quit ");
             terminal.close();
             return (false);
-        }
-        else
+        } else
             return (true);
     }
 }
