@@ -37,6 +37,9 @@ public class Main {
         Bomb bomb1 = new Bomb();
         PrintBomb(terminal, bomb1);
 
+        //List of projectiles (Empty at start)
+        List<Projectile> projectileList = new ArrayList<>();
+
         //Repeat game
 
         do {
@@ -51,6 +54,7 @@ public class Main {
 
             //wait for user input
             int index = 0;
+            int projectileIndex = 0;
             KeyStroke keyStroke = null;
 
 
@@ -66,9 +70,13 @@ public class Main {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
                 index++;
+                projectileIndex++;
                 if(index % 100 == 0) {
                     DropBomb(player, bomb1);
                     PrintBomb(terminal, bomb1);
+                }
+                if(projectileIndex % 100 == 0) {
+                    MoveProjectiles(projectileList, terminal);
                 }
             }while (keyStroke==null);
 
@@ -85,6 +93,7 @@ public class Main {
                 case ArrowUp:
                   /*  player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy */
+                    projectileList.add(new Projectile(player.getRow()-1, player.getColumn(), terminal));
                     break;
 
                 case ArrowLeft:
@@ -98,6 +107,7 @@ public class Main {
                     break;
 
             }
+
             /*Check if inside screen
             continueReadingInput = isInScreen(terminal,player); */
 
@@ -109,7 +119,7 @@ public class Main {
                     if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
-                if (CrashWall == true || type.equals(KeyType.ArrowUp)) {
+                if (CrashWall == true ){  // || type.equals(KeyType.ArrowUp)) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
@@ -120,9 +130,14 @@ public class Main {
 
 
                     index++;
-                    if(index % 4 == 0) {
+                    if(index % 5 == 0) {
                         DropBomb(player, bomb1);
                         PrintBomb(terminal, bomb1);
+                    }
+
+                    projectileIndex++;
+                    if(index % 5 ==0) {
+                        MoveProjectiles(projectileList, terminal);
                     }
 
 
@@ -272,6 +287,12 @@ public class Main {
 
     public static void DropBomb(Player player, Bomb bomb) {
         bomb.moveBombDown();
+    }
+    
+    public static void MoveProjectiles(List<Projectile> projectileList, Terminal terminal) throws Exception{
+        for (Projectile projectile : projectileList) {
+            projectile.PrintProjectile(projectile, terminal);
+        }
     }
 
     public static boolean isInScreen(Terminal terminal, Player player) throws Exception {
