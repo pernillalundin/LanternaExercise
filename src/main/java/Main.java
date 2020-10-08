@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Lanterna exercise version 6");
+        System.out.println("Lanterna exercise version 7");
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
@@ -30,7 +30,7 @@ public class Main {
         PrintEnemy(terminal, enemy1);
 
         //Create player
-        Player player = new Player(1, 1);
+        Player player = new Player(24, 40);
         PrintPlayer(terminal, player);
 
         //Create bomb
@@ -76,13 +76,14 @@ public class Main {
 
             switch (type) {
                 case ArrowDown:
-                    player.movePlayerDown(); //move player
-                    FollowPlayer(player, enemy1); //move enemy
+                  /*  player.movePlayerDown(); //move player
+                    FollowPlayer(player, enemy1); //move enemy */
+                    PrintGameOver(terminal, player); //Print GAME OVER
                     break;
 
                 case ArrowUp:
-                    player.movePlayerUp();//move player
-                    FollowPlayer(player, enemy1); //move enemy
+                  /*  player.movePlayerUp();//move player
+                    FollowPlayer(player, enemy1); //move enemy */
                     break;
 
                 case ArrowLeft:
@@ -96,8 +97,8 @@ public class Main {
                     break;
 
             }
-            //Check if inside screen
-            continueReadingInput = isInScreen(terminal, player);
+            /*Check if inside screen
+            continueReadingInput = isInScreen(terminal,player); */
 
             if (continueReadingInput == true) {
 
@@ -107,16 +108,15 @@ public class Main {
                     if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
-                if (CrashWall == true) {
+                if (CrashWall == true || type.equals(KeyType.ArrowUp)) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
-                    //Move the player
-
-                    PrintPlayer(terminal, player);
-                    //Move the enemy
-                    PrintEnemy(terminal, enemy1);
+                    player.increasePoints(1); // increase player point by 1
+                    PrintPlayer(terminal, player); //Move the player
+                    PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);
+
 
                     index++;
                     if(index % 4 == 0) {
@@ -132,18 +132,7 @@ public class Main {
                     }
                     if (CrashEnemy == true) {
                         continueReadingInput = false;
-                        String GameOver = "GAME OVER";
-                        int GameOverRow = 12;
-                        int GameOverColumn = 40;
-                        for (int i = 0; i < GameOver.length(); i++) {
-                            terminal.setCursorPosition(GameOverColumn, GameOverRow);
-                            terminal.putCharacter(GameOver.charAt(i));
-                            GameOverColumn += 1;
-                        }
-                        terminal.flush();
-                        Thread.sleep(2000);
-                        System.out.println("Quit ");
-                        terminal.close();
+                        PrintGameOver(terminal, player); //Print GAME OVER
                     }
                 }
             }
@@ -184,6 +173,38 @@ public class Main {
         terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
         terminal.putCharacter(' ');
         terminal.flush();
+        PrintPoints(terminal, player,77,24);
+    }
+    public static void PrintPoints(Terminal terminal, Player player, int posColumn, int posRow) throws Exception {
+        char pointEntal = '0';
+        char pointTiotal = ' ';
+        char pointHundratal = ' ';
+        int hundratal = 0;
+        int tiotal = 0;
+        int ental = 0;
+        int tempPoints = player.getPoints();
+        // hundred
+        if (tempPoints > 99) {
+            hundratal = player.getPoints()/100;
+            pointHundratal = Character.forDigit(hundratal, 10);
+            tempPoints -=(hundratal*100);
+            pointTiotal = '0';
+        }
+        if (tempPoints > 10) {
+            tiotal = tempPoints/10;
+            pointTiotal = Character.forDigit(tiotal, 10);
+            tempPoints -=(tiotal*10);
+        }
+        pointEntal = Character.forDigit(tempPoints, 10);
+
+        //Print points in lower right corner
+        terminal.setCursorPosition(posColumn, posRow);
+        terminal.putCharacter(pointHundratal);
+        terminal.setCursorPosition(posColumn+1, posRow);
+        terminal.putCharacter(pointTiotal);
+        terminal.setCursorPosition(posColumn+2, posRow);
+        terminal.putCharacter(pointEntal);
+        terminal.flush();
     }
 
     public static void PrintEnemy(Terminal terminal, Enemy enemy) throws Exception {
@@ -202,6 +223,29 @@ public class Main {
         terminal.setCursorPosition(bomb.getOldColumn(), bomb.getOldRow());
         terminal.putCharacter(' ');
         terminal.flush();
+    }
+
+
+    public static void PrintGameOver(Terminal terminal, Player player) throws Exception {
+        String GameOver = "GAME OVER";
+        int GameOverRow = 12;
+        int GameOverColumn = 40;
+        for (int i = 0; i < GameOver.length(); i++) {
+            terminal.setCursorPosition(GameOverColumn, GameOverRow);
+            terminal.putCharacter(GameOver.charAt(i));
+            GameOverColumn += 1;
+        }
+        terminal.flush();
+
+        terminal.setForegroundColor(TextColor.ANSI.WHITE);
+        PrintPoints(terminal, player,43,13); //Print points
+        terminal.setCursorPosition(46, 13);
+        terminal.putCharacter('p');
+        terminal.flush();
+
+        Thread.sleep(2000);
+        System.out.println("Quit ");
+        terminal.close();
     }
 
     public static void FollowPlayer(Player player, Enemy enemy) {
