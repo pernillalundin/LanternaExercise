@@ -17,26 +17,23 @@ public class Main {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
+        boolean continueReadingInput = true;
 
+        //Create wall
         final char WallChar = '\u2588';
-        final char enemyChar = '\u058D';
         List<Position> wall = new ArrayList<>();
-
         CreateWall(wall);
         PrintWall(terminal, WallChar, wall);
 
         //Create a enemy that hunt the player
         Enemy enemy1 = new Enemy();
-        PrintEnemy(terminal,enemy1);
+        PrintEnemy(terminal, enemy1);
 
-        //move around the player
-        boolean continueReadingInput = true;
-
+        //Create player
         Player player = new Player(1, 1);
         PrintPlayer(terminal, player);
 
-        //start position of player
-
+        //Repeat game
         do {
             player.setOldRow(player.getRow());
             player.setOldColumn(player.getColumn());
@@ -44,8 +41,9 @@ public class Main {
             enemy1.setOldRow(enemy1.getRow());
             enemy1.setOldColumn(enemy1.getColumn());
 
-            KeyStroke keyStroke = null;
+
             //wait for user input
+            KeyStroke keyStroke = null;
             do {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
@@ -75,12 +73,9 @@ public class Main {
 
             }
             //Check if inside screen
-            if (player.getRow() == 0 || player.getColumn() ==0 || player.getRow() > 24 || player.getColumn() > 80) {
-                continueReadingInput = false;
-                System.out.println("Quit ");
-                terminal.close();
-            }
-            else {
+            continueReadingInput = isInScreen(terminal,player);
+
+            if (continueReadingInput == true) {
                 //Check if player moved into the walls
                 boolean CrashWall = false;
                 for (Position p : wall) {
@@ -90,13 +85,13 @@ public class Main {
                 if (CrashWall == true) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
-                }
-                else {
+                } else {
                     //Move the player
 
                     PrintPlayer(terminal, player);
                     //Move the enemy
-                    PrintEnemy(terminal,enemy1);
+                    PrintEnemy(terminal, enemy1);
+                    PrintWall(terminal, WallChar, wall);
 
 
                     //Check the bomb position
@@ -109,10 +104,10 @@ public class Main {
                         String GameOver = "GAME OVER";
                         int GameOverRow = 12;
                         int GameOverColumn = 40;
-                        for (int i = 0; i<GameOver.length();i++) {
+                        for (int i = 0; i < GameOver.length(); i++) {
                             terminal.setCursorPosition(GameOverColumn, GameOverRow);
                             terminal.putCharacter(GameOver.charAt(i));
-                            GameOverColumn +=1;
+                            GameOverColumn += 1;
                         }
                         terminal.flush();
                         Thread.sleep(2000);
@@ -122,6 +117,7 @@ public class Main {
                 }
             }
         } while (continueReadingInput);
+
     }
 
     public static void CreateWall(List<Position> wall) throws Exception {
@@ -130,15 +126,16 @@ public class Main {
         int wallcolumn = 45;
 
         //Add horisontal obsticle
-        for (int i = 10;i<40;i++) {
-            wall.add(new Position(i,wallrow));
+        for (int i = 10; i < 40; i++) {
+            wall.add(new Position(i, wallrow));
         }
         //Add vertical obsticle
-        for (int i = 5;i<20;i++) {
-            wall.add(new Position(wallcolumn,i));
+        for (int i = 5; i < 20; i++) {
+            wall.add(new Position(wallcolumn, i));
         }
 
     }
+
     public static void PrintWall(Terminal terminal, char WallChar, List<Position> wall) throws Exception {
         //Print walls
         terminal.setForegroundColor(TextColor.ANSI.RED);
@@ -148,6 +145,7 @@ public class Main {
             terminal.flush();
         }
     }
+
     public static void PrintPlayer(Terminal terminal, Player player) throws Exception {
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
         terminal.setCursorPosition(player.getColumn(), player.getRow());
@@ -156,7 +154,8 @@ public class Main {
         terminal.putCharacter(' ');
         terminal.flush();
     }
-    public static void PrintEnemy(Terminal terminal, Enemy enemy) throws Exception{
+
+    public static void PrintEnemy(Terminal terminal, Enemy enemy) throws Exception {
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
         terminal.setCursorPosition(enemy.getColumn(), enemy.getRow());
         terminal.putCharacter(enemy.getSymbol());
@@ -164,15 +163,15 @@ public class Main {
         terminal.putCharacter(' ');
         terminal.flush();
     }
-    public static void FollowPlayer(Player player,Enemy enemy){
+
+    public static void FollowPlayer(Player player, Enemy enemy) {
 
         if (enemy.getRow() == player.getRow()) {
             if (enemy.getColumn() < player.getColumn())
                 enemy.moveEnemyRight();
             else
                 enemy.moveEnemyLeft();
-        }
-        else {
+        } else {
             if (enemy.getRow() < player.getRow())
                 enemy.moveEnemyDown();
             else
@@ -180,6 +179,16 @@ public class Main {
         }
 
 
+    }
 
+    public static boolean isInScreen(Terminal terminal, Player player) throws Exception {
+        //Check if outside screen
+        if (player.getRow() == 0 || player.getColumn() == 0 || player.getRow() > 24 || player.getColumn() > 80) {
+            System.out.println("Quit ");
+            terminal.close();
+            return (false);
+        }
+        else
+            return (true);
     }
 }
