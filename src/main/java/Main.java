@@ -33,7 +33,12 @@ public class Main {
         Player player = new Player(1, 1);
         PrintPlayer(terminal, player);
 
+        //Create bomb
+        Bomb bomb1 = new Bomb();
+        PrintBomb(terminal,bomb1);
+
         //Repeat game
+
         do {
             player.setOldRow(player.getRow());
             player.setOldColumn(player.getColumn());
@@ -41,34 +46,42 @@ public class Main {
             enemy1.setOldRow(enemy1.getRow());
             enemy1.setOldColumn(enemy1.getColumn());
 
+           bomb1.setOldRow((bomb1.getRow()));
+           bomb1.setColumn(bomb1.getColumn());
 
             //wait for user input
             KeyStroke keyStroke = null;
+
             do {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
-            } while (keyStroke == null);
+            }
+            while (keyStroke == null);
             KeyType type = keyStroke.getKeyType();
 
             switch (type) {
                 case ArrowDown:
                     player.movePlayerDown(); //move player
                     FollowPlayer(player, enemy1); //move enemy
+                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowUp:
                     player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy
+                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
                     FollowPlayer(player, enemy1); //move enemy
+                    DropBomb(player,bomb1);
                     break;
 
                 case ArrowRight:
                     player.movePlayerRight(); //move player
                     FollowPlayer(player, enemy1); //move enemy
+                    DropBomb(player,bomb1);
                     break;
 
             }
@@ -92,7 +105,7 @@ public class Main {
                     //Move the enemy
                     PrintEnemy(terminal, enemy1);
                     PrintWall(terminal, WallChar, wall);
-
+                    PrintBomb(terminal, bomb1);
 
                     //Check the bomb position
                     boolean CrashEnemy = false;
@@ -163,6 +176,14 @@ public class Main {
         terminal.putCharacter(' ');
         terminal.flush();
     }
+    public static void PrintBomb(Terminal terminal,Bomb bomb) throws Exception{
+        terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+        terminal.setCursorPosition(bomb.getColumn(), bomb.getRow());
+        terminal.putCharacter(bomb.getSymbol());
+        terminal.setCursorPosition(bomb.getOldColumn(), bomb.getOldRow());
+        terminal.putCharacter(' ');
+        terminal.flush();
+    }
 
     public static void FollowPlayer(Player player, Enemy enemy) {
 
@@ -178,8 +199,11 @@ public class Main {
                 enemy.moveEnemyUp();
         }
 
-
     }
+    public static void DropBomb (Player player,Bomb bomb){
+        bomb.moveBombDown();
+    }
+
 
     public static boolean isInScreen(Terminal terminal, Player player) throws Exception {
         //Check if outside screen
