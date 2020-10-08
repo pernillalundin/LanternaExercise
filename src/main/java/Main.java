@@ -73,8 +73,8 @@ public class Main {
                     break;
 
             }
-            //Check if inside screen
-            continueReadingInput = isInScreen(terminal,player);
+            /*Check if inside screen
+            continueReadingInput = isInScreen(terminal,player); */
 
             if (continueReadingInput == true) {
                 //Check if player moved into the walls
@@ -83,7 +83,7 @@ public class Main {
                     if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
-                if (CrashWall == true || type.equals(KeyType.ArrowDown) || type.equals(KeyType.ArrowUp)) {
+                if (CrashWall == true || type.equals(KeyType.ArrowUp)) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
@@ -194,6 +194,7 @@ public class Main {
         }
         terminal.flush();
 
+        terminal.setForegroundColor(TextColor.ANSI.WHITE);
         PrintPoints(terminal, player,43,13); //Print points
         terminal.setCursorPosition(46, 13);
         terminal.putCharacter('p');
