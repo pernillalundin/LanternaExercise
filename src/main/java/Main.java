@@ -19,22 +19,15 @@ public class Main {
         terminal.setCursorVisible(false);
 
         final char WallChar = '\u2588';
-        final char BombChar = '\u058D';
+        final char enemyChar = '\u058D';
         List<Position> wall = new ArrayList<>();
 
         CreateWall(wall);
         PrintWall(terminal, WallChar, wall);
 
-        //Create a bomb that hunt the player
-        Random r = new Random();
-        Position bombPosition = new Position(r.nextInt(80), r.nextInt(24));
-        int oldBombRow = bombPosition.getX();
-        int oldBombColumn = bombPosition.getY();
-        terminal.setForegroundColor(TextColor.ANSI.WHITE);
-        terminal.setCursorPosition(bombPosition.getX(), bombPosition.getY());
-        terminal.putCharacter(BombChar);
-        terminal.flush();
-
+        //Create a enemy that hunt the player
+        Enemy enemy1 = new Enemy();
+        PrintEnemy(terminal,enemy1);
 
         //move around the player
         boolean continueReadingInput = true;
@@ -47,8 +40,10 @@ public class Main {
         do {
             player.setOldRow(player.getRow());
             player.setOldColumn(player.getColumn());
-            oldBombRow = bombPosition.getY();
-            oldBombColumn = bombPosition.getX();
+
+            enemy1.setOldRow(enemy1.getRow());
+            enemy1.setOldColumn(enemy1.getColumn());
+
             KeyStroke keyStroke = null;
             //wait for user input
             do {
@@ -60,59 +55,24 @@ public class Main {
             switch (type) {
                 case ArrowDown:
                     player.movePlayerDown(); //move player
-                    //move bomb
-                    if (bombPosition.getY() < player.getRow())
-                        bombPosition.setY(bombPosition.getY()+2);
-                    else if (bombPosition.getY() == player.getRow()) {
-                        if (bombPosition.getX() < player.getColumn())
-                            bombPosition.setX(bombPosition.getX()+2);
-                        else
-                            bombPosition.setX(bombPosition.getX()-2);
-                    }
-                    else
-                        bombPosition.setY(bombPosition.getY()-2);
+                    FollowPlayer(player, enemy1); //move enemy
                     break;
+
                 case ArrowUp:
-                    player.movePlayerUp();
-                    //move bomb
-                    if (bombPosition.getY() < player.getRow())
-                        bombPosition.setY(bombPosition.getY()+2);
-                    else if (bombPosition.getY() == player.getRow()) {
-                        if (bombPosition.getX() < player.getColumn())
-                            bombPosition.setX(bombPosition.getX()+2);
-                        else
-                            bombPosition.setX(bombPosition.getX()-2);
-                    }
-                    else
-                        bombPosition.setY(bombPosition.getY()-2);
+                    player.movePlayerUp();//move player
+                    FollowPlayer(player, enemy1); //move enemy
                     break;
+
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
-                    //move bomb
-                    if (bombPosition.getX() < player.getColumn())
-                        bombPosition.setX(bombPosition.getX()+2);
-                    else if (bombPosition.getX() == player.getColumn()) {
-                        if (bombPosition.getY() < player.getRow())
-                            bombPosition.setY(bombPosition.getY()+2);
-                        else
-                            bombPosition.setY(bombPosition.getY()-2);
-                    }
-                    else
-                        bombPosition.setX(bombPosition.getX()-2);
+                    FollowPlayer(player, enemy1); //move enemy
                     break;
+
                 case ArrowRight:
                     player.movePlayerRight(); //move player
-                    //move bomb
-                    if (bombPosition.getX() < player.getColumn())
-                        bombPosition.setX(bombPosition.getX()+2);
-                    else if (bombPosition.getX() == player.getColumn()) {
-                        if (bombPosition.getY() < player.getRow())
-                            bombPosition.setY(bombPosition.getY()+2);
-                        else
-                            bombPosition.setY(bombPosition.getY()-2);
-                    }
-                    else
-                        bombPosition.setX(bombPosition.getX()-2);
+                    FollowPlayer(player, enemy1); //move enemy
+                    break;
+
             }
             //Check if inside screen
             if (player.getRow() == 0 || player.getColumn() ==0 || player.getRow() > 24 || player.getColumn() > 80) {
@@ -135,21 +95,16 @@ public class Main {
                     //Move the player
 
                     PrintPlayer(terminal, player);
-                    //Move the bomb
-                    terminal.setForegroundColor(TextColor.ANSI.WHITE);
-                    terminal.setCursorPosition(bombPosition.getX(), bombPosition.getY());
-                    terminal.putCharacter(BombChar);
-                    terminal.setCursorPosition(oldBombColumn, oldBombRow);
-                    terminal.putCharacter(' ');
+                    //Move the enemy
+                    PrintEnemy(terminal,enemy1);
 
-                    terminal.flush();
 
                     //Check the bomb position
-                    boolean CrashBomb = false;
-                    if (bombPosition.getX() == player.getColumn() && bombPosition.getY() == player.getRow()) {
-                        CrashBomb = true;
+                    boolean CrashEnemy = false;
+                    if (enemy1.getColumn() == player.getColumn() && enemy1.getRow() == player.getRow()) {
+                        CrashEnemy = true;
                     }
-                    if (CrashBomb == true) {
+                    if (CrashEnemy == true) {
                         continueReadingInput = false;
                         String GameOver = "GAME OVER";
                         int GameOverRow = 12;
@@ -200,5 +155,31 @@ public class Main {
         terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
         terminal.putCharacter(' ');
         terminal.flush();
+    }
+    public static void PrintEnemy(Terminal terminal, Enemy enemy) throws Exception{
+        terminal.setForegroundColor(TextColor.ANSI.WHITE);
+        terminal.setCursorPosition(enemy.getColumn(), enemy.getRow());
+        terminal.putCharacter(enemy.getSymbol());
+        terminal.setCursorPosition(enemy.getOldColumn(), enemy.getOldRow());
+        terminal.putCharacter(' ');
+        terminal.flush();
+    }
+    public static void FollowPlayer(Player player,Enemy enemy){
+
+        if (enemy.getRow() == player.getRow()) {
+            if (enemy.getColumn() < player.getColumn())
+                enemy.moveEnemyRight();
+            else
+                enemy.moveEnemyLeft();
+        }
+        else {
+            if (enemy.getRow() < player.getRow())
+                enemy.moveEnemyDown();
+            else
+                enemy.moveEnemyUp();
+        }
+
+
+
     }
 }
