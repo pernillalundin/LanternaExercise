@@ -33,7 +33,12 @@ public class Main {
         Player player = new Player(24, 40);
         PrintPlayer(terminal, player);
 
+        //Create bomb
+        Bomb bomb1 = new Bomb();
+        PrintBomb(terminal, bomb1);
+
         //Repeat game
+
         do {
             player.setOldRow(player.getRow());
             player.setOldColumn(player.getColumn());
@@ -41,13 +46,32 @@ public class Main {
             enemy1.setOldRow(enemy1.getRow());
             enemy1.setOldColumn(enemy1.getColumn());
 
+            bomb1.setOldRow((bomb1.getRow()));
+            bomb1.setColumn(bomb1.getColumn());
 
             //wait for user input
+            int index = 0;
             KeyStroke keyStroke = null;
+
+
+        /*    do {
+                index++;
+                if(index % 100 == 0) {
+                    DropBomb(player, bomb1);
+                    PrintBomb(terminal, bomb1);
+                }
+            } while (bomb1.isAlive());*/
+
             do {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
-            } while (keyStroke == null);
+                index++;
+                if(index % 100 == 0) {
+                    DropBomb(player, bomb1);
+                    PrintBomb(terminal, bomb1);
+                }
+            }while (keyStroke==null);
+
             KeyType type = keyStroke.getKeyType();
 
             switch (type) {
@@ -73,10 +97,16 @@ public class Main {
                     break;
 
             }
+<<<<<<< HEAD
             /*Check if inside screen
             continueReadingInput = isInScreen(terminal,player); */
+=======
+            //Check if inside screen
+            continueReadingInput = isInScreen(terminal, player);
+>>>>>>> 0bad7eb64d289ac3e17d3031b6293c82f47c3930
 
             if (continueReadingInput == true) {
+
                 //Check if player moved into the walls
                 boolean CrashWall = false;
                 for (Position p : wall) {
@@ -92,6 +122,16 @@ public class Main {
                     PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);
 
+<<<<<<< HEAD
+=======
+                    index++;
+                    if(index % 4 == 0) {
+                        DropBomb(player, bomb1);
+                        PrintBomb(terminal, bomb1);
+                    }
+
+
+>>>>>>> 0bad7eb64d289ac3e17d3031b6293c82f47c3930
                     //Check the bomb position
                     boolean CrashEnemy = false;
                     if (enemy1.getColumn() == player.getColumn() && enemy1.getRow() == player.getRow()) {
@@ -183,6 +223,7 @@ public class Main {
         terminal.flush();
     }
 
+<<<<<<< HEAD
     public static void PrintGameOver(Terminal terminal, Player player) throws Exception {
         String GameOver = "GAME OVER";
         int GameOverRow = 12;
@@ -203,6 +244,15 @@ public class Main {
         Thread.sleep(2000);
         System.out.println("Quit ");
         terminal.close();
+=======
+    public static void PrintBomb(Terminal terminal, Bomb bomb) throws Exception {
+        terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+        terminal.setCursorPosition(bomb.getColumn(), bomb.getRow());
+        terminal.putCharacter(bomb.getSymbol());
+        terminal.setCursorPosition(bomb.getOldColumn(), bomb.getOldRow());
+        terminal.putCharacter(' ');
+        terminal.flush();
+>>>>>>> 0bad7eb64d289ac3e17d3031b6293c82f47c3930
     }
 
     public static void FollowPlayer(Player player, Enemy enemy) {
@@ -219,8 +269,12 @@ public class Main {
                 enemy.moveEnemyUp();
         }
 
-
     }
+
+    public static void DropBomb(Player player, Bomb bomb) {
+        bomb.moveBombDown();
+    }
+
 
     public static boolean isInScreen(Terminal terminal, Player player) throws Exception {
         //Check if outside screen
@@ -228,8 +282,7 @@ public class Main {
             System.out.println("Quit ");
             terminal.close();
             return (false);
-        }
-        else
+        } else
             return (true);
     }
 }
