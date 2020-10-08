@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Lanterna exercise version 4");
+        System.out.println("Lanterna exercise version 5");
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
