@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Lanterna exercise version 7");
+        System.out.println("Lanterna exercise version 8");
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
@@ -25,7 +25,7 @@ public class Main {
         CreateWall(wall);
         PrintWall(terminal, WallChar, wall);
 
-        //Create a enemy that hunt the player
+        //Create an enemy that hunt the player
         Enemy enemy1 = new Enemy();
         PrintEnemy(terminal, enemy1);
 
@@ -79,6 +79,7 @@ public class Main {
                   /*  player.movePlayerDown(); //move player
                     FollowPlayer(player, enemy1); //move enemy */
                     PrintGameOver(terminal, player); //Print GAME OVER
+                    continueReadingInput = false;
                     break;
 
                 case ArrowUp:
@@ -142,16 +143,22 @@ public class Main {
 
     public static void CreateWall(List<Position> wall) throws Exception {
         //Create walls
-        int wallrow = 15;
-        int wallcolumn = 45;
+        int wallrow = 22;
+        int wallcolumn = 0;
 
-        //Add horisontal obsticle
-        for (int i = 10; i < 40; i++) {
+        //Add horisontal walls
+        for (int i = 10; i < 20; i++) {
             wall.add(new Position(i, wallrow));
         }
-        //Add vertical obsticle
-        for (int i = 5; i < 20; i++) {
+        for (int i = 60; i < 70; i++) {
+            wall.add(new Position(i, wallrow));
+        }
+        //Add vertical walls
+        for (int i = 0; i < 24; i++) {
             wall.add(new Position(wallcolumn, i));
+        }
+        for (int i = 0; i < 24; i++) {
+            wall.add(new Position(80, i));
         }
 
     }
@@ -173,7 +180,7 @@ public class Main {
         terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
         terminal.putCharacter(' ');
         terminal.flush();
-        PrintPoints(terminal, player,77,24);
+        PrintPoints(terminal, player,76,24);
     }
     public static void PrintPoints(Terminal terminal, Player player, int posColumn, int posRow) throws Exception {
         char pointEntal = '0';
@@ -225,7 +232,6 @@ public class Main {
         terminal.flush();
     }
 
-
     public static void PrintGameOver(Terminal terminal, Player player) throws Exception {
         String GameOver = "GAME OVER";
         int GameOverRow = 12;
@@ -267,7 +273,6 @@ public class Main {
     public static void DropBomb(Player player, Bomb bomb) {
         bomb.moveBombDown();
     }
-
 
     public static boolean isInScreen(Terminal terminal, Player player) throws Exception {
         //Check if outside screen
