@@ -30,7 +30,7 @@ public class Main {
         PrintEnemy(terminal, enemy1);
 
         //Create player
-        Player player = new Player(1, 1);
+        Player player = new Player(24, 40);
         PrintPlayer(terminal, player);
 
         //Repeat game
@@ -52,13 +52,13 @@ public class Main {
 
             switch (type) {
                 case ArrowDown:
-                    player.movePlayerDown(); //move player
-                    FollowPlayer(player, enemy1); //move enemy
+                  /*  player.movePlayerDown(); //move player
+                    FollowPlayer(player, enemy1); //move enemy */
                     break;
 
                 case ArrowUp:
-                    player.movePlayerUp();//move player
-                    FollowPlayer(player, enemy1); //move enemy
+                  /*  player.movePlayerUp();//move player
+                    FollowPlayer(player, enemy1); //move enemy */
                     break;
 
                 case ArrowLeft:
@@ -82,17 +82,14 @@ public class Main {
                     if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
-                if (CrashWall == true) {
+                if (CrashWall == true || type.equals(KeyType.ArrowDown) || type.equals(KeyType.ArrowUp)) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
-                    //Move the player
-
-                    PrintPlayer(terminal, player);
-                    //Move the enemy
-                    PrintEnemy(terminal, enemy1);
+                    player.increasePoints(1); // increase player point by 1
+                    PrintPlayer(terminal, player); //Move the player
+                    PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);
-
 
                     //Check the bomb position
                     boolean CrashEnemy = false;
@@ -101,6 +98,7 @@ public class Main {
                     }
                     if (CrashEnemy == true) {
                         continueReadingInput = false;
+                        //Print GAME OVER
                         String GameOver = "GAME OVER";
                         int GameOverRow = 12;
                         int GameOverColumn = 40;
@@ -110,6 +108,12 @@ public class Main {
                             GameOverColumn += 1;
                         }
                         terminal.flush();
+                        //Print points
+                        PrintPoints(terminal, player,43,13);
+                        terminal.setCursorPosition(46, 13);
+                        terminal.putCharacter('p');
+                        terminal.flush();
+
                         Thread.sleep(2000);
                         System.out.println("Quit ");
                         terminal.close();
@@ -152,6 +156,38 @@ public class Main {
         terminal.putCharacter(player.getSymbol());
         terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
         terminal.putCharacter(' ');
+        terminal.flush();
+        PrintPoints(terminal, player,77,24);
+    }
+    public static void PrintPoints(Terminal terminal, Player player, int posColumn, int posRow) throws Exception {
+        char pointEntal = '0';
+        char pointTiotal = ' ';
+        char pointHundratal = ' ';
+        int hundratal = 0;
+        int tiotal = 0;
+        int ental = 0;
+        int tempPoints = player.getPoints();
+        // hundred
+        if (tempPoints > 99) {
+            hundratal = player.getPoints()/100;
+            pointHundratal = Character.forDigit(hundratal, 10);
+            tempPoints -=(hundratal*100);
+            pointTiotal = '0';
+        }
+        if (tempPoints > 10) {
+            tiotal = tempPoints/10;
+            pointTiotal = Character.forDigit(tiotal, 10);
+            tempPoints -=(tiotal*10);
+        }
+        pointEntal = Character.forDigit(tempPoints, 10);
+
+        //Print points in lower right corner
+        terminal.setCursorPosition(posColumn, posRow);
+        terminal.putCharacter(pointHundratal);
+        terminal.setCursorPosition(posColumn+1, posRow);
+        terminal.putCharacter(pointTiotal);
+        terminal.setCursorPosition(posColumn+2, posRow);
+        terminal.putCharacter(pointEntal);
         terminal.flush();
     }
 

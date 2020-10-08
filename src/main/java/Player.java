@@ -4,6 +4,7 @@ public class Player {
     private int oldRow;
     private int oldColumn;
     private final char symbol;
+    private int points;
 
     public Player(int row, int column) {
         this.row = row;
@@ -11,6 +12,11 @@ public class Player {
         this.oldRow = 24;
         this.oldColumn = 80;
         this.symbol = '\u0398';
+        this.points = 0;
+    }
+
+    public void increasePoints(int add) {
+        points += add;
     }
 
     public void movePlayerUp() {
@@ -35,6 +41,14 @@ public class Player {
         oldColumn = column;
         oldRow = row;
         column +=1;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     public int getRow() {
