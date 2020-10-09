@@ -5,11 +5,14 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Random;
 
 
 public class Main {
+
+    public static boolean continueReadingInput = true;
 
     public static void main(String[] args) throws Exception {
         System.out.println("Lanterna exercise version 8");
@@ -17,7 +20,7 @@ public class Main {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
         terminal.setCursorVisible(false);
-        boolean continueReadingInput = true;
+
 
         KeyType type = null;
 
@@ -66,7 +69,7 @@ public class Main {
                 index++;
                 projectileIndex++;
                 if (index % 100 == 0) {
-                    MoveBombs(bombList, terminal);
+                    MoveBombs(bombList, terminal,player);
                     PrintPlayer(terminal, player, type);
                 }
                 if (projectileIndex % 100 == 0) {
@@ -74,7 +77,7 @@ public class Main {
                     PrintPlayer(terminal, player, type);
                     checkBombCrash(projectileList, bombList, player);
                 }
-                if (index % 500 == 0) {
+                if (index % 300 == 0) {
                     bombList.add(new Bomb());
                 }
                 terminal.setForegroundColor(TextColor.ANSI.WHITE);
@@ -134,7 +137,7 @@ public class Main {
 
                     index++;
                     if (index % 5 == 0) {
-                        MoveBombs(bombList, terminal);
+                        MoveBombs(bombList, terminal,player);
                         PrintPlayer(terminal, player, type);
                     }
 
@@ -144,7 +147,7 @@ public class Main {
                         PrintPlayer(terminal, player, type);
                         checkBombCrash(projectileList, bombList, player);
                     }
-                    if (index % 500 == 0) {
+                    if (index % 300 == 0) {
                         bombList.add(new Bomb());
                     }
 
@@ -295,27 +298,33 @@ public class Main {
 
     }
 
-    public static void DropBomb(Bomb bomb) {
+    public static void DropBomb(Bomb bomb,Terminal terminal, Player player)throws Exception {
         bomb.moveBombDown();
+           if (bomb.getRow() == 24) {
+           PrintGameOver(terminal, player); //Print GAME OVER
+         continueReadingInput = false;
+        }
     }
-
     public static void checkBombCrash(List<Projectile> projectileList, List<Bomb> bombList, Player player) {
         //Check if bomb is hit by projectile
         boolean CrashBomb = false;
         for (Projectile p : projectileList) {
-            if (bombList.size() > 0) {
-                for (Bomb b : bombList) {
+      //      if (bombList.size() > 0) {
+            for (Bomb b : bombList) {
                     if ((p.getColumn() == b.getColumn() && p.getRow() == b.getRow()) || (p.getColumn() == b.getColumn() && p.getRow() - 1 == b.getRow())) {
                         CrashBomb = true;
-                        bombList.remove(b);
+                        b.setAlive(false);
+                        b.setSymbol(' ');
                     }
-                }
+            //    }
 
             }
         }
+
         if (CrashBomb == true) {
             player.increasePoints(10);
             System.out.println("Crash bomb");
+
         }
     }
 
@@ -325,11 +334,13 @@ public class Main {
         }
     }
 
-    public static void MoveBombs(List<Bomb> bombList, Terminal terminal) throws Exception {
+    public static void MoveBombs(List<Bomb> bombList, Terminal terminal,Player player) throws Exception {
         if (bombList.size() > 0) {
             for (Bomb bomb : bombList) {
-                DropBomb(bomb);
-                PrintBomb(terminal, bomb);
+                if (bomb.isAlive()==true){
+                    DropBomb(bomb,terminal,player);
+                    PrintBomb(terminal, bomb);
+                }
             }
         }
     }

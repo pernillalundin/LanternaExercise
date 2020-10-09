@@ -7,13 +7,18 @@ public class Bomb {
         private int column;
         private int oldRow;
         private int oldColumn;
-        private final char symbol;
+
+    public void setSymbol(char symbol) {
+        this.symbol = symbol;
+    }
+
+    private char symbol;
         private boolean isAlive;
 
         public Bomb() {
             Random r = new Random();
             this.row = 1;
-            this.column = r.nextInt(80);
+            this.column = r.nextInt(78)+1;
             this.oldRow = 0;
             this.oldColumn = 0;
             this.symbol = '\u058D';
