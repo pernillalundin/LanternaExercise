@@ -19,6 +19,8 @@ public class Main {
         terminal.setCursorVisible(false);
         boolean continueReadingInput = true;
 
+        KeyType type = null;
+
         //Create wall
         final char WallChar = '\u2588';
         List<Position> wall = new ArrayList<>();
@@ -31,7 +33,7 @@ public class Main {
 
         //Create player
         Player player = new Player(24, 40);
-        PrintPlayer(terminal, player);
+        PrintPlayer(terminal, player, type);
 
         //Create bomb
         Bomb bomb1 = new Bomb();
@@ -74,13 +76,17 @@ public class Main {
                 if(index % 100 == 0) {
                     DropBomb(player, bomb1);
                     PrintBomb(terminal, bomb1);
+                    PrintPlayer(terminal,player,type);
                 }
                 if(projectileIndex % 100 == 0) {
                     MoveProjectiles(projectileList, terminal);
+                    PrintPlayer(terminal, player, type);
+                    checkBombCrash(projectileList, bomb1, player);
                 }
+
             }while (keyStroke==null);
 
-            KeyType type = keyStroke.getKeyType();
+            type = keyStroke.getKeyType();
 
             switch (type) {
                 case ArrowDown:
@@ -94,7 +100,7 @@ public class Main {
                   /*  player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy */
                     projectileList.add(new Projectile(player.getRow()-1, player.getColumn(), terminal));
-                    continue;
+                    break;
 
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
@@ -105,7 +111,6 @@ public class Main {
                     player.movePlayerRight(); //move player
                     FollowPlayer(player, enemy1); //move enemy
                     break;
-
             }
 
             /*Check if inside screen
@@ -124,7 +129,7 @@ public class Main {
                     player.setRow(player.getOldRow());
                 } else {
                     player.increasePoints(1); // increase player point by 1
-                    PrintPlayer(terminal, player); //Move the player
+                    PrintPlayer(terminal, player, type); //Move the player
                     PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);
 
@@ -133,15 +138,17 @@ public class Main {
                     if(index % 5 == 0) {
                         DropBomb(player, bomb1);
                         PrintBomb(terminal, bomb1);
+                        PrintPlayer(terminal,player,type);
                     }
 
                     projectileIndex++;
                     if(projectileIndex % 5 ==0) {
                         MoveProjectiles(projectileList, terminal);
+                        PrintPlayer(terminal,player,type);
+                        checkBombCrash(projectileList, bomb1, player);
                     }
 
-
-                    //Check the bomb position
+                    //Check the enemy position
                     boolean CrashEnemy = false;
                     if (enemy1.getColumn() == player.getColumn() && enemy1.getRow() == player.getRow()) {
                         CrashEnemy = true;
@@ -150,6 +157,7 @@ public class Main {
                         continueReadingInput = false;
                         PrintGameOver(terminal, player); //Print GAME OVER
                     }
+                    //checkBombCrash(projectileList, bomb1, player);
                 }
             }
         } while (continueReadingInput);
@@ -188,12 +196,14 @@ public class Main {
         }
     }
 
-    public static void PrintPlayer(Terminal terminal, Player player) throws Exception {
+    public static void PrintPlayer(Terminal terminal, Player player, KeyType type) throws Exception {
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
         terminal.setCursorPosition(player.getColumn(), player.getRow());
         terminal.putCharacter(player.getSymbol());
-        terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
-        terminal.putCharacter(' ');
+        if (type != KeyType.ArrowUp) {
+            terminal.setCursorPosition(player.getOldColumn(), player.getOldRow());
+            terminal.putCharacter(' ');
+        }
         terminal.flush();
         PrintPoints(terminal, player,76,24);
     }
@@ -288,7 +298,20 @@ public class Main {
     public static void DropBomb(Player player, Bomb bomb) {
         bomb.moveBombDown();
     }
-    
+    public static void checkBombCrash(List<Projectile> projectileList, Bomb bomb, Player player) {
+        //Check if bomb is hit by projectile
+        boolean CrashBomb = false;
+        for (Projectile p : projectileList) {
+            if (p.getColumn() == bomb.getColumn() && p.getRow() == bomb.getRow()) {
+                CrashBomb = true;
+            }
+        }
+        if (CrashBomb == true) {
+            player.increasePoints(10);
+            bomb.setAlive(false);
+            System.out.println("Crash bomb");
+        }
+    }
     public static void MoveProjectiles(List<Projectile> projectileList, Terminal terminal) throws Exception{
         for (Projectile projectile : projectileList) {
             projectile.PrintProjectile(projectile, terminal);
