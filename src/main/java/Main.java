@@ -32,7 +32,7 @@ public class Main {
 
         //Create an enemy that hunt the player
         Enemy enemy1 = new Enemy();
-        PrintEnemy(terminal, enemy1);
+        //PrintEnemy(terminal, enemy1);
 
         //Create player
         Player player = new Player(24, 40);
@@ -106,11 +106,13 @@ public class Main {
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
                     FollowPlayer(player, enemy1); //move enemy
+                    player.increasePoints(1); // increase player point by 1
                     break;
 
                 case ArrowRight:
                     player.movePlayerRight(); //move player
                     FollowPlayer(player, enemy1); //move enemy
+                    player.increasePoints(1); // increase player point by 1
                     break;
             }
 
@@ -129,7 +131,7 @@ public class Main {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
-                    player.increasePoints(1); // increase player point by 1
+                   // player.increasePoints(1); // increase player point by 1
                     PrintPlayer(terminal, player, type); //Move the player
                     PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);

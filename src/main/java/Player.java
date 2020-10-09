@@ -11,7 +11,8 @@ public class Player {
         this.column = column;
         this.oldRow = 24;
         this.oldColumn = 80;
-        this.symbol = '\u0398';
+        //this.symbol = '\u0398';
+        this.symbol = '\u0394';
         this.points = 0;
     }
 
