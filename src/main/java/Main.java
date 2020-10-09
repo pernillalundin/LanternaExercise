@@ -83,6 +83,10 @@ public class Main {
                     PrintPlayer(terminal, player, type);
                     checkBombCrash(projectileList, bomb1, player);
                 }
+                terminal.setForegroundColor(TextColor.ANSI.WHITE);
+                terminal.setCursorPosition(player.getColumn(), player.getRow());
+                terminal.putCharacter(player.getSymbol());
+                terminal.flush();
 
             }while (keyStroke==null);
 
@@ -302,7 +306,7 @@ public class Main {
         //Check if bomb is hit by projectile
         boolean CrashBomb = false;
         for (Projectile p : projectileList) {
-            if (p.getColumn() == bomb.getColumn() && p.getRow() == bomb.getRow()) {
+            if ((p.getColumn() == bomb.getColumn() && p.getRow() == bomb.getRow()) || (p.getColumn() == bomb.getColumn() && p.getRow()-1 == bomb.getRow())) {
                 CrashBomb = true;
             }
         }
