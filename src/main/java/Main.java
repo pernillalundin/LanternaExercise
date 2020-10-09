@@ -94,7 +94,7 @@ public class Main {
                   /*  player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy */
                     projectileList.add(new Projectile(player.getRow()-1, player.getColumn(), terminal));
-                    break;
+                    continue;
 
                 case ArrowLeft:
                     player.movePlayerLeft(); //move player
@@ -136,7 +136,7 @@ public class Main {
                     }
 
                     projectileIndex++;
-                    if(index % 5 ==0) {
+                    if(projectileIndex % 5 ==0) {
                         MoveProjectiles(projectileList, terminal);
                     }
 
