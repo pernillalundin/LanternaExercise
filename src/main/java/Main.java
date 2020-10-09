@@ -44,7 +44,6 @@ public class Main {
         bombList.add(new Bomb());
 
 
-
         //List of projectiles (Empty at start)
         List<Projectile> projectileList = new ArrayList<>();
 
@@ -69,7 +68,7 @@ public class Main {
                 index++;
                 projectileIndex++;
                 if (index % 100 == 0) {
-                    MoveBombs(bombList, terminal,player);
+                    MoveBombs(bombList, terminal, player, wall);
                     PrintPlayer(terminal, player, type);
                 }
                 if (projectileIndex % 100 == 0) {
@@ -131,7 +130,7 @@ public class Main {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
-                   // player.increasePoints(1); // increase player point by 1
+                    // player.increasePoints(1); // increase player point by 1
                     PrintPlayer(terminal, player, type); //Move the player
                     PrintEnemy(terminal, enemy1); //Move the enemy
                     PrintWall(terminal, WallChar, wall);
@@ -139,7 +138,7 @@ public class Main {
 
                     index++;
                     if (index % 5 == 0) {
-                        MoveBombs(bombList, terminal,player);
+                        MoveBombs(bombList, terminal, player, wall);
                         PrintPlayer(terminal, player, type);
                     }
 
@@ -300,25 +299,31 @@ public class Main {
 
     }
 
-    public static void DropBomb(Bomb bomb,Terminal terminal, Player player)throws Exception {
+    public static void DropBomb(Bomb bomb, Terminal terminal, Player player, List<Position> wall) throws Exception {
         bomb.moveBombDown();
-           if (bomb.getRow() == 24) {
-           PrintGameOver(terminal, player); //Print GAME OVER
-         continueReadingInput = false;
+        if (bomb.getRow() == 24) {
+            PrintGameOver(terminal, player); //Print GAME OVER
+            continueReadingInput = false;
+        }
+        for (Position p: wall) {
+            if (p.getY()== bomb.getRow() && p.getX()== bomb.getColumn()){
+                bomb.setAlive(false);
+            }
         }
     }
+
     public static void checkBombCrash(List<Projectile> projectileList, List<Bomb> bombList, Player player) {
         //Check if bomb is hit by projectile
         boolean CrashBomb = false;
         for (Projectile p : projectileList) {
-      //      if (bombList.size() > 0) {
+            //      if (bombList.size() > 0) {
             for (Bomb b : bombList) {
-                    if ((p.getColumn() == b.getColumn() && p.getRow() == b.getRow()) || (p.getColumn() == b.getColumn() && p.getRow() - 1 == b.getRow())) {
-                        CrashBomb = true;
-                        b.setAlive(false);
-                        b.setSymbol(' ');
-                    }
-            //    }
+                if ((p.getColumn() == b.getColumn() && p.getRow() == b.getRow()) || (p.getColumn() == b.getColumn() && p.getRow() - 1 == b.getRow())) {
+                    CrashBomb = true;
+                    b.setAlive(false);
+                    b.setSymbol(' ');
+                }
+                //    }
 
             }
         }
@@ -336,11 +341,11 @@ public class Main {
         }
     }
 
-    public static void MoveBombs(List<Bomb> bombList, Terminal terminal,Player player) throws Exception {
+    public static void MoveBombs(List<Bomb> bombList, Terminal terminal, Player player, List<Position> wall) throws Exception {
         if (bombList.size() > 0) {
             for (Bomb bomb : bombList) {
-                if (bomb.isAlive()==true){
-                    DropBomb(bomb,terminal,player);
+                if (bomb.isAlive() == true) {
+                    DropBomb(bomb, terminal, player, wall);
                     PrintBomb(terminal, bomb);
                 }
             }
