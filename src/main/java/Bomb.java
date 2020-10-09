@@ -20,6 +20,15 @@ public class Bomb {
             this.isAlive=true;
         }
 
+    public Bomb(boolean isAlive) {
+        this.row = 25;
+        this.column = 81;
+        this.oldRow = 0;
+        this.oldColumn = 0;
+        this.symbol = ' ';
+        this.isAlive= isAlive;
+    }
+
     public boolean isAlive() {
         return isAlive;
     }

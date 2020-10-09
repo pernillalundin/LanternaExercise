@@ -20,25 +20,25 @@ public class Enemy {
     public void moveEnemyUp() {
         oldColumn = column;
         oldRow = row;
-        row -=2;
+        row -=0;
     }
 
     public void moveEnemyDown() {
         oldColumn = column;
         oldRow = row;
-        row +=2;
+        row +=0;
     }
 
     public void moveEnemyLeft() {
         oldColumn = column;
         oldRow = row;
-        column -=2;
+        column -=0;
     }
 
     public void moveEnemyRight() {
         oldColumn = column;
         oldRow = row;
-        column +=2;
+        column +=0;
     }
 
     public int getRow() {

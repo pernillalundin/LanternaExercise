@@ -36,8 +36,11 @@ public class Main {
         PrintPlayer(terminal, player, type);
 
         //Create bomb
-        Bomb bomb1 = new Bomb();
-        PrintBomb(terminal, bomb1);
+        List<Bomb> bombList = new ArrayList<>();
+        bombList.add(new Bomb(false));
+        bombList.add(new Bomb());
+
+
 
         //List of projectiles (Empty at start)
         List<Projectile> projectileList = new ArrayList<>();
@@ -51,44 +54,35 @@ public class Main {
             enemy1.setOldRow(enemy1.getRow());
             enemy1.setOldColumn(enemy1.getColumn());
 
-            bomb1.setOldRow((bomb1.getRow()));
-            bomb1.setColumn(bomb1.getColumn());
-
             //wait for user input
             int index = 0;
             int projectileIndex = 0;
             KeyStroke keyStroke = null;
 
 
-        /*    do {
-                index++;
-                if(index % 100 == 0) {
-                    DropBomb(player, bomb1);
-                    PrintBomb(terminal, bomb1);
-                }
-            } while (bomb1.isAlive());*/
-
             do {
                 Thread.sleep(5);
                 keyStroke = terminal.pollInput();
                 index++;
                 projectileIndex++;
-                if(index % 100 == 0) {
-                    DropBomb(player, bomb1);
-                    PrintBomb(terminal, bomb1);
-                    PrintPlayer(terminal,player,type);
+                if (index % 100 == 0) {
+                    MoveBombs(bombList, terminal);
+                    PrintPlayer(terminal, player, type);
                 }
-                if(projectileIndex % 100 == 0) {
+                if (projectileIndex % 100 == 0) {
                     MoveProjectiles(projectileList, terminal);
                     PrintPlayer(terminal, player, type);
-                    checkBombCrash(projectileList, bomb1, player);
+                    checkBombCrash(projectileList, bombList, player);
+                }
+                if (index % 500 == 0) {
+                    bombList.add(new Bomb());
                 }
                 terminal.setForegroundColor(TextColor.ANSI.WHITE);
                 terminal.setCursorPosition(player.getColumn(), player.getRow());
                 terminal.putCharacter(player.getSymbol());
                 terminal.flush();
 
-            }while (keyStroke==null);
+            } while (keyStroke == null);
 
             type = keyStroke.getKeyType();
 
@@ -103,7 +97,7 @@ public class Main {
                 case ArrowUp:
                   /*  player.movePlayerUp();//move player
                     FollowPlayer(player, enemy1); //move enemy */
-                    projectileList.add(new Projectile(player.getRow()-1, player.getColumn(), terminal));
+                    projectileList.add(new Projectile(player.getRow() - 1, player.getColumn(), terminal));
                     break;
 
                 case ArrowLeft:
@@ -128,7 +122,7 @@ public class Main {
                     if (p.getX() == player.getColumn() && p.getY() == player.getRow())
                         CrashWall = true;
                 }
-                if (CrashWall == true ){  // || type.equals(KeyType.ArrowUp)) {
+                if (CrashWall == true) {  // || type.equals(KeyType.ArrowUp)) {
                     player.setColumn(player.getOldColumn());
                     player.setRow(player.getOldRow());
                 } else {
@@ -139,17 +133,19 @@ public class Main {
 
 
                     index++;
-                    if(index % 5 == 0) {
-                        DropBomb(player, bomb1);
-                        PrintBomb(terminal, bomb1);
-                        PrintPlayer(terminal,player,type);
+                    if (index % 5 == 0) {
+                        MoveBombs(bombList, terminal);
+                        PrintPlayer(terminal, player, type);
                     }
 
                     projectileIndex++;
-                    if(projectileIndex % 5 ==0) {
+                    if (projectileIndex % 5 == 0) {
                         MoveProjectiles(projectileList, terminal);
-                        PrintPlayer(terminal,player,type);
-                        checkBombCrash(projectileList, bomb1, player);
+                        PrintPlayer(terminal, player, type);
+                        checkBombCrash(projectileList, bombList, player);
+                    }
+                    if (index % 500 == 0) {
+                        bombList.add(new Bomb());
                     }
 
                     //Check the enemy position
@@ -161,7 +157,6 @@ public class Main {
                         continueReadingInput = false;
                         PrintGameOver(terminal, player); //Print GAME OVER
                     }
-                    //checkBombCrash(projectileList, bomb1, player);
                 }
             }
         } while (continueReadingInput);
@@ -209,8 +204,9 @@ public class Main {
             terminal.putCharacter(' ');
         }
         terminal.flush();
-        PrintPoints(terminal, player,76,24);
+        PrintPoints(terminal, player, 76, 24);
     }
+
     public static void PrintPoints(Terminal terminal, Player player, int posColumn, int posRow) throws Exception {
         char pointEntal = '0';
         char pointTiotal = ' ';
@@ -221,24 +217,24 @@ public class Main {
         int tempPoints = player.getPoints();
         // hundred
         if (tempPoints > 99) {
-            hundratal = player.getPoints()/100;
+            hundratal = player.getPoints() / 100;
             pointHundratal = Character.forDigit(hundratal, 10);
-            tempPoints -=(hundratal*100);
+            tempPoints -= (hundratal * 100);
             pointTiotal = '0';
         }
         if (tempPoints > 10) {
-            tiotal = tempPoints/10;
+            tiotal = tempPoints / 10;
             pointTiotal = Character.forDigit(tiotal, 10);
-            tempPoints -=(tiotal*10);
+            tempPoints -= (tiotal * 10);
         }
         pointEntal = Character.forDigit(tempPoints, 10);
 
         //Print points in lower right corner
         terminal.setCursorPosition(posColumn, posRow);
         terminal.putCharacter(pointHundratal);
-        terminal.setCursorPosition(posColumn+1, posRow);
+        terminal.setCursorPosition(posColumn + 1, posRow);
         terminal.putCharacter(pointTiotal);
-        terminal.setCursorPosition(posColumn+2, posRow);
+        terminal.setCursorPosition(posColumn + 2, posRow);
         terminal.putCharacter(pointEntal);
         terminal.flush();
     }
@@ -273,7 +269,7 @@ public class Main {
         terminal.flush();
 
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
-        PrintPoints(terminal, player,43,13); //Print points
+        PrintPoints(terminal, player, 43, 13); //Print points
         terminal.setCursorPosition(46, 13);
         terminal.putCharacter('p');
         terminal.flush();
@@ -299,26 +295,42 @@ public class Main {
 
     }
 
-    public static void DropBomb(Player player, Bomb bomb) {
+    public static void DropBomb(Bomb bomb) {
         bomb.moveBombDown();
     }
-    public static void checkBombCrash(List<Projectile> projectileList, Bomb bomb, Player player) {
+
+    public static void checkBombCrash(List<Projectile> projectileList, List<Bomb> bombList, Player player) {
         //Check if bomb is hit by projectile
         boolean CrashBomb = false;
         for (Projectile p : projectileList) {
-            if ((p.getColumn() == bomb.getColumn() && p.getRow() == bomb.getRow()) || (p.getColumn() == bomb.getColumn() && p.getRow()-1 == bomb.getRow())) {
-                CrashBomb = true;
+            if (bombList.size() > 0) {
+                for (Bomb b : bombList) {
+                    if ((p.getColumn() == b.getColumn() && p.getRow() == b.getRow()) || (p.getColumn() == b.getColumn() && p.getRow() - 1 == b.getRow())) {
+                        CrashBomb = true;
+                        bombList.remove(b);
+                    }
+                }
+
             }
         }
         if (CrashBomb == true) {
             player.increasePoints(10);
-            bomb.setAlive(false);
             System.out.println("Crash bomb");
         }
     }
-    public static void MoveProjectiles(List<Projectile> projectileList, Terminal terminal) throws Exception{
+
+    public static void MoveProjectiles(List<Projectile> projectileList, Terminal terminal) throws Exception {
         for (Projectile projectile : projectileList) {
             projectile.PrintProjectile(projectile, terminal);
+        }
+    }
+
+    public static void MoveBombs(List<Bomb> bombList, Terminal terminal) throws Exception {
+        if (bombList.size() > 0) {
+            for (Bomb bomb : bombList) {
+                DropBomb(bomb);
+                PrintBomb(terminal, bomb);
+            }
         }
     }
 
