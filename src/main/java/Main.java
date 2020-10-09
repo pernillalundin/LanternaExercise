@@ -15,7 +15,7 @@ public class Main {
     public static boolean continueReadingInput = true;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Lanterna exercise version 8");
+        System.out.println("Welcome to: Space Bombs");
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Terminal terminal = terminalFactory.createTerminal();
@@ -76,7 +76,7 @@ public class Main {
                     PrintPlayer(terminal, player, type);
                     checkBombCrash(projectileList, bombList, player);
                 }
-                if (index % 300 == 0) {
+                if (index % 200 == 0) {
                     bombList.add(new Bomb());
                 }
                 terminal.setForegroundColor(TextColor.ANSI.WHITE);
@@ -148,7 +148,7 @@ public class Main {
                         PrintPlayer(terminal, player, type);
                         checkBombCrash(projectileList, bombList, player);
                     }
-                    if (index % 300 == 0) {
+                    if (index % 200 == 0) {
                         bombList.add(new Bomb());
                     }
 
